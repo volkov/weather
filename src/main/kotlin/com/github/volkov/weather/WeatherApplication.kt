@@ -11,7 +11,7 @@ import org.springframework.web.client.getForObject
 @SpringBootApplication
 @RestController
 class WeatherApplication(
-        @Value("\${OPENWEATHER_TOKEN}") val token: String
+        @Value("\${OPENWEATHER_TOKEN:}") val token: String
 ) {
 
     @GetMapping("/")
