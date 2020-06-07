@@ -11,7 +11,7 @@ import java.time.ZonedDateTime
 
 const val BASE_URL = "https://api.openweathermap.org/data/2.5"
 
-data class Weather(val timestamp: ZonedDateTime, val temperature: Int)
+data class Weather(val timestamp: ZonedDateTime, val temperature: Double)
 
 @Component
 class OpenWeatherClient(@Value("\${OPENWEATHER_TOKEN:}") val token: String) {
@@ -22,11 +22,10 @@ class OpenWeatherClient(@Value("\${OPENWEATHER_TOKEN:}") val token: String) {
         val list = restTemplate.getForObject<Map<String, List<Map<String, Any>>>>(
                 "${BASE_URL}/forecast?id=$id&units=metric&appid=$token", JsonNode::class
         ).getValue("list")
-        return list.map { t ->
-            val timestamp = t["dt"] as Int
+        return list.map {
             Weather(
-                    toZonedDateTime(timestamp),
-                    (t["main"] as Map<String, Int>).getValue("temp")
+                    toZonedDateTime(it["dt"] as Int),
+                    (it["main"] as Map<String, Double>).getValue("temp")
             )
         }
     }
