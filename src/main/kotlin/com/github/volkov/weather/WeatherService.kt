@@ -17,7 +17,10 @@ class WeatherService(val weatherClient: OpenWeatherClient) {
     @Scheduled(cron = "0 * * * * ?")
     fun update() {
         val timestamp = Instant.now()
-        logger.info("Going to update ${data.size} locations")
+        if (data.isEmpty()) {
+            logger.info("Nothing to update.")
+        }
+        logger.info("Going to update ${data.size} locations...")
         for (location in data.keys) {
             loadAndSave(location, timestamp)
         }

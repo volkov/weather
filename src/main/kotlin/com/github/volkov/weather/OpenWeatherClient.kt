@@ -20,14 +20,14 @@ class OpenWeatherClient(@Value("\${OPENWEATHER_TOKEN:}") val token: String) {
 
     @Suppress("UNCHECKED_CAST")
     fun getForecast(id: Long): List<Weather> {
-        val list = restTemplate.getForObject<Map<String, List<Map<String, Any>>>>(
-                "${BASE_URL}/forecast?id=$id&units=metric&appid=$token", JsonNode::class
-        ).getValue("list")
+        val list = restTemplate.getForObject<JsonNode>(
+                "${BASE_URL}/forecast?id=$id&units=metric&appid=$token"
+        ).get("list")!!.asIterable()
         return list.map {
-            val rain = (it["rain"] as Map<String, Double>?)?.getValue("3h") ?: 0.0
+            val rain = it["rain"]?.get("3h")?.asDouble() ?: 0.0
             Weather(
-                    toZonedDateTime(it["dt"] as Int),
-                    (it["main"] as Map<String, Double>).getValue("temp"),
+                    toZonedDateTime(it["dt"].intValue()),
+                    it["main"].get("temp").doubleValue(),
                     rain
             )
         }
