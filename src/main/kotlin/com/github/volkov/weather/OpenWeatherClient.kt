@@ -11,7 +11,7 @@ import java.time.ZonedDateTime
 
 const val BASE_URL = "https://api.openweathermap.org/data/2.5"
 
-data class Weather(val timestamp: ZonedDateTime, val temperature: Double, val rain: Double)
+data class Weather(val locationId: Long, val timestamp: ZonedDateTime, val temperature: Double, val rain: Double)
 
 @Component
 class OpenWeatherClient(@Value("\${OPENWEATHER_TOKEN:}") val token: String) {
@@ -26,9 +26,10 @@ class OpenWeatherClient(@Value("\${OPENWEATHER_TOKEN:}") val token: String) {
         return list.map {
             val rain = it["rain"]?.get("3h")?.asDouble() ?: 0.0
             Weather(
-                    toZonedDateTime(it["dt"].intValue()),
-                    it["main"].get("temp").doubleValue(),
-                    rain
+                    locationId = id,
+                    timestamp = toZonedDateTime(it["dt"].intValue()),
+                    temperature = it["main"].get("temp").doubleValue(),
+                    rain = rain
             )
         }
     }
