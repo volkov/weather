@@ -4,46 +4,40 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-import java.time.Instant
 
 @Component
-class WeatherService(val weatherClient: OpenWeatherClient) {
+class WeatherService(val weatherClient: OpenWeatherClient, val weatherRepository: WeatherRepository) {
 
     val logger: Logger = LoggerFactory.getLogger(javaClass)
-
-    val data = mutableMapOf<Long, MutableMap<Instant, MutableMap<Instant, Weather>>>()
 
     @Synchronized
     @Scheduled(cron = "0 * * * * ?")
     fun update() {
-        val timestamp = Instant.now()
-        if (data.isEmpty()) {
-            logger.info("Nothing to update.")
+        val locations = weatherRepository.locations()
+        if (locations.isEmpty()) {
+            logger.info("No locations to update.")
+            return
         }
-        logger.info("Going to update ${data.size} locations...")
-        for (location in data.keys) {
-            loadAndSave(location, timestamp)
+        logger.info("Going to update ${locations.size} locations...")
+        for (location in locations) {
+            loadAndSave(location)
         }
         logger.info("Updated.")
     }
 
-    fun getWeather(location: Long): Map<Instant, Map<Instant, Weather>> {
-        if (location !in data) {
-            loadAndSave(location, Instant.now())
+    fun getWeather(location: Long): List<Weather> {
+        val result = weatherRepository.list(location)
+        if (result.isNotEmpty()) {
+            return result
         }
-        return data.getValue(location)
+        return loadAndSave(location)
     }
 
     @Synchronized
-    fun loadAndSave(location: Long, timestamp: Instant) {
+    fun loadAndSave(location: Long): List<Weather> {
         val forecast = weatherClient.getForecast(location)
-        val locationData = data.getOrPut(location, { mutableMapOf() })
-        for (weather in forecast) {
-            val timedData = locationData.getOrPut(weather.timestamp.toInstant(), { mutableMapOf() })
-            timedData[timestamp] = weather
-        }
+        forecast.forEach { weatherRepository.save(it) }
+        return forecast
     }
-
-    fun get(location: Long) = data[location]
 
 }
