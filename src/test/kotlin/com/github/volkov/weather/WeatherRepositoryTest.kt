@@ -17,4 +17,9 @@ class WeatherRepositoryTest(@Autowired val weatherRepository: WeatherRepository)
     fun insert() {
         weatherRepository.save(Weather(1, ZonedDateTime.now(), 1.0, 2.0))
     }
+
+    @Test
+    fun select() {
+        weatherRepository.list(1)
+    }
 }

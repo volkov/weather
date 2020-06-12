@@ -3,6 +3,8 @@ package com.github.volkov.weather
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
 import java.sql.Timestamp
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 /**
  * User: serg-v
@@ -25,11 +27,17 @@ class WeatherRepository(val jdbcTemplate: NamedParameterJdbcTemplate) {
     }
 
     fun list(locationId: Int): List<Weather> {
-        return jdbcTemplate.queryForList(
+        return jdbcTemplate.query(
                 "select * from weather where location_id = :locationId",
-                mapOf("locationId" to locationId),
-                Weather::class.java
-        )
+                mapOf("locationId" to locationId)
+        ) { rs, _ ->
+            Weather(
+                    locationId = rs.getLong("location_id"),
+                    timestamp = ZonedDateTime.ofInstant(rs.getTimestamp("timestamp").toInstant(), ZoneId.systemDefault()),
+                    temperature = rs.getDouble("temperature"),
+                    rain = rs.getDouble("rain")
+            )
+        }
     }
 
 }
