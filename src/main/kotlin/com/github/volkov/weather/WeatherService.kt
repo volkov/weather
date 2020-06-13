@@ -11,7 +11,7 @@ class WeatherService(val weatherClient: OpenWeatherClient, val weatherRepository
     val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     @Synchronized
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "\${WEATHER_UPDATE_CRON:0 * * * * ?}")
     fun update() {
         val locations = weatherRepository.locations()
         if (locations.isEmpty()) {
