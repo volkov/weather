@@ -8,7 +8,8 @@ data class Weather(
         val timestamp: ZonedDateTime,
         val temperature: Double,
         val rain: Double,
-        val updated: ZonedDateTime = ZonedDateTime.now()
+        val updated: ZonedDateTime = ZonedDateTime.now(),
+        val isForecast: Boolean = true
 )
 
 data class WeatherDiff(

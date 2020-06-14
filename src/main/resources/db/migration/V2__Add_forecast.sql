@@ -1,0 +1,1 @@
+alter table weather add column forecast bool not null default true;

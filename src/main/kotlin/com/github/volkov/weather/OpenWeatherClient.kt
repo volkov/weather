@@ -13,19 +13,26 @@ class OpenWeatherClient(@Value("\${OPENWEATHER_TOKEN:}") val token: String) {
 
     val restTemplate = RestTemplate()
 
-    fun getForecast(id: Long): List<Weather> {
+    fun forecast(id: Long): List<Weather> {
         val list = restTemplate.getForObject<JsonNode>(
-                "${BASE_URL}/forecast?id=$id&units=metric&appid=$token"
+                "$BASE_URL/forecast?id=$id&units=metric&appid=$token"
         ).get("list")!!.asIterable()
-        return list.map {
-            val rain = it["rain"]?.get("3h")?.asDouble() ?: 0.0
-            Weather(
-                    locationId = id,
-                    timestamp = toZonedDateTime(it["dt"].intValue()),
-                    temperature = it["main"].get("temp").doubleValue(),
-                    rain = rain
-            )
-        }
+        return list.map { fromJson(id, true, it) }
+    }
+
+    private fun fromJson(id: Long, isForecast: Boolean, it: JsonNode): Weather {
+        val rain = it["rain"]?.get("3h")?.asDouble() ?: 0.0
+        return Weather(
+                locationId = id,
+                timestamp = toZonedDateTime(it["dt"].intValue()),
+                temperature = it["main"].get("temp").doubleValue(),
+                rain = rain,
+                isForecast = isForecast
+        )
+    }
+
+    fun current(id: Long): Weather {
+        return fromJson(id, false, restTemplate.getForObject("$BASE_URL/weather?id=$id&units=metric&appid=$token"))
     }
 
 }

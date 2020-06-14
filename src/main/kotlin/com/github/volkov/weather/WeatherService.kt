@@ -6,6 +6,7 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.time.Duration
 import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import kotlin.math.round
 
 @Component
@@ -58,7 +59,7 @@ class WeatherService(val weatherClient: OpenWeatherClient, val weatherRepository
                 continue
             }
             result.add(WeatherDiff(
-                    timeDelta = Duration.between(latestWeather.updated, weather.updated),
+                    timeDelta = truncatedDuration(latestWeather.updated, weather.updated),
                     temperatureDelta = roundTemperature(weather.temperature - latestWeather.temperature),
                     rainDelta = weather.rain - latestWeather.rain
             ))
@@ -68,13 +69,17 @@ class WeatherService(val weatherClient: OpenWeatherClient, val weatherRepository
         return result.reversed()
     }
 
+    private fun truncatedDuration(from: ZonedDateTime, to: ZonedDateTime) =
+            Duration.between(from.truncatedTo(ChronoUnit.MINUTES), to.truncatedTo(ChronoUnit.MINUTES))
+
     private fun roundTemperature(temperature: Double): Double {
         return round(temperature * 10) / 10
     }
 
     @Synchronized
     fun loadAndSave(location: Long): List<Weather> {
-        val forecast = weatherClient.getForecast(location)
+        val forecast = weatherClient.forecast(location).toMutableList()
+        forecast.add(weatherClient.current(location))
         forecast.forEach { weatherRepository.save(it) }
         return forecast
     }
