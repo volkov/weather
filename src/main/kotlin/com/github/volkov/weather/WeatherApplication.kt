@@ -22,7 +22,7 @@ class WeatherApplication(
     }
 
     @GetMapping("/{location}/diffs")
-    fun getDiffs(@PathVariable("location") location: Long, @RequestParam("timestamp", required = false) timestamp: ZonedDateTime): Any {
+    fun getDiffs(@PathVariable("location") location: Long, @RequestParam("timestamp", required = false) timestamp: ZonedDateTime?): Any {
         return weatherService.getWeatherDiffs(location, timestamp)
     }
 
