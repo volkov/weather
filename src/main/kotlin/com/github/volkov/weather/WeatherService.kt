@@ -4,6 +4,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
+import java.time.Duration
 
 @Component
 class WeatherService(val weatherClient: OpenWeatherClient, val weatherRepository: WeatherRepository) {
@@ -31,6 +32,38 @@ class WeatherService(val weatherClient: OpenWeatherClient, val weatherRepository
             return result
         }
         return loadAndSave(location)
+    }
+
+    fun getWeatherDiffs(location: Long): List<WeatherWithDiff> {
+        return getWeather(location)
+                .groupBy { it.timestamp }
+                .mapValues { entry ->
+                    val sortedWeather = entry.value.sortedByDescending { it.updated }
+                    val latestWeather = sortedWeather[0]
+                    WeatherWithDiff(
+                            weather = latestWeather,
+                            diffs = getDiffs(latestWeather, sortedWeather.drop(1))
+                    )
+                }
+                .values.toList()
+    }
+
+    private fun getDiffs(latestWeather: Weather, sortedWeathers: List<Weather>): List<WeatherDiff> {
+        var previous: Weather? = null
+        val result = ArrayList<WeatherDiff>()
+        for (weather in sortedWeathers.reversed()) {
+            if (previous != null && previous.temperature == weather.temperature && previous.rain == weather.rain) {
+                continue
+            }
+            result.add(WeatherDiff(
+                    timeDelta = Duration.between(latestWeather.updated, weather.updated),
+                    temperatureDelta = weather.temperature - latestWeather.temperature,
+                    rainDelta = weather.rain - latestWeather.rain
+            ))
+            previous = weather
+        }
+
+        return result
     }
 
     @Synchronized

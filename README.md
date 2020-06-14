@@ -8,4 +8,4 @@ docker build . -t weather
 docker run --network host -e OPENWEATHER_TOKEN=<APITOKEN> --rm weather
 ```
 
-Try [get forecast](http://localhost:8080/498817)
+Try [get forecasts](http://localhost:8080/498817) or [forecast diffs](http://localhost:8080/498817/diffs) 

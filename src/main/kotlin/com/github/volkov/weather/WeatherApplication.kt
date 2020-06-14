@@ -19,6 +19,11 @@ class WeatherApplication(
         return weatherService.getWeather(location)
     }
 
+    @GetMapping("/{location}/diffs")
+    fun getDiffs(@PathVariable("location") location: Long): Any {
+        return weatherService.getWeatherDiffs(location)
+    }
+
 }
 
 fun main(args: Array<String>) {
