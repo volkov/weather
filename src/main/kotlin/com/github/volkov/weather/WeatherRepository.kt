@@ -35,7 +35,7 @@ class WeatherRepository(val jdbcTemplate: NamedParameterJdbcTemplate) {
                     timestamp = rs.getTimestamp("timestamp").toZonedDateTime(),
                     temperature = rs.getDouble("temperature"),
                     rain = rs.getDouble("rain"),
-                    updated = rs.getTimestamp("timestamp").toZonedDateTime()
+                    updated = rs.getTimestamp("updated").toZonedDateTime()
 
             )
         }
