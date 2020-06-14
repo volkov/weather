@@ -63,7 +63,7 @@ class WeatherService(val weatherClient: OpenWeatherClient, val weatherRepository
             previous = weather
         }
 
-        return result
+        return result.reversed()
     }
 
     @Synchronized
