@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.time.Duration
+import kotlin.math.round
 
 @Component
 class WeatherService(val weatherClient: OpenWeatherClient, val weatherRepository: WeatherRepository) {
@@ -57,13 +58,17 @@ class WeatherService(val weatherClient: OpenWeatherClient, val weatherRepository
             }
             result.add(WeatherDiff(
                     timeDelta = Duration.between(latestWeather.updated, weather.updated),
-                    temperatureDelta = weather.temperature - latestWeather.temperature,
+                    temperatureDelta = roundTemperature(weather.temperature - latestWeather.temperature),
                     rainDelta = weather.rain - latestWeather.rain
             ))
             previous = weather
         }
 
         return result.reversed()
+    }
+
+    private fun roundTemperature(temperature: Double): Double {
+        return round(temperature * 10) / 10
     }
 
     @Synchronized
