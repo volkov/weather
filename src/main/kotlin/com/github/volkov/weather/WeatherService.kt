@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.time.Duration
+import java.time.ZonedDateTime
 import kotlin.math.round
 
 @Component
@@ -35,8 +36,8 @@ class WeatherService(val weatherClient: OpenWeatherClient, val weatherRepository
         return loadAndSave(location)
     }
 
-    fun getWeatherDiffs(location: Long): List<WeatherWithDiff> {
-        return getWeather(location)
+    fun getWeatherDiffs(location: Long, timestamp: ZonedDateTime?): List<WeatherWithDiff> {
+        return weatherRepository.list(location, timestamp)
                 .groupBy { it.timestamp }
                 .mapValues { entry ->
                     val sortedWeather = entry.value.sortedByDescending { it.updated }

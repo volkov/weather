@@ -23,7 +23,7 @@ class WeatherServiceTest {
                 weather3
         ))
 
-        val weatherDiffs = service.getWeatherDiffs(1)
+        val weatherDiffs = service.getWeatherDiffs(1, null)
         assertThat(weatherDiffs).isEqualTo(listOf(
                 WeatherWithDiff(
                         weather1,

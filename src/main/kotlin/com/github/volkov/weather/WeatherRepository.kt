@@ -2,6 +2,7 @@ package com.github.volkov.weather
 
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
+import java.time.ZonedDateTime
 
 /**
  * User: serg-v
@@ -25,10 +26,16 @@ class WeatherRepository(val jdbcTemplate: NamedParameterJdbcTemplate) {
         )
     }
 
-    fun list(locationId: Long): List<Weather> {
+    fun list(locationId: Long, timestamp: ZonedDateTime? = null): List<Weather> {
+        var query = "select * from weather where location_id = :locationId"
+        val params = mutableMapOf<String, Any>("locationId" to locationId)
+        if (timestamp != null) {
+            query += " and timestamp = :timestamp"
+            params.put("timestamp", timestamp.toTimestamp())
+        }
         return jdbcTemplate.query(
-                "select * from weather where location_id = :locationId",
-                mapOf("locationId" to locationId)
+                query,
+                params
         ) { rs, _ ->
             Weather(
                     locationId = rs.getLong("location_id"),
