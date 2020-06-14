@@ -2,6 +2,7 @@ package com.github.volkov.weather
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -22,7 +23,10 @@ class WeatherApplication(
     }
 
     @GetMapping("/{location}/diffs")
-    fun getDiffs(@PathVariable("location") location: Long, @RequestParam("timestamp", required = false) timestamp: ZonedDateTime?): Any {
+    fun getDiffs(
+            @PathVariable("location") location: Long,
+            @RequestParam("timestamp", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) timestamp: ZonedDateTime?
+    ): Any {
         return weatherService.getWeatherDiffs(location, timestamp)
     }
 
