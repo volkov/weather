@@ -16,8 +16,8 @@ fun Timestamp.toZonedDateTime(): ZonedDateTime =
 fun ZonedDateTime.toTimestamp(): Timestamp =
         Timestamp.from(toInstant())
 
-fun toZonedDateTime(timestamp: Int): ZonedDateTime =
+fun Int.toZonedDateTime(): ZonedDateTime =
         ZonedDateTime.ofInstant(
-                Instant.ofEpochSecond(timestamp.toLong()),
+                Instant.ofEpochSecond(toLong()),
                 ZoneId.systemDefault()
         )
