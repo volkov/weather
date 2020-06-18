@@ -26,6 +26,17 @@ class WeatherRepositoryTest(@Autowired val weatherRepository: WeatherRepository)
     fun select() {
         saveWeather()
         assertThat(weatherRepository.list(1).size).isEqualTo(1)
+        assertThat(weatherRepository.list(1, forecast = true).size).isEqualTo(1)
+        assertThat(weatherRepository.list(1, forecast = false)).isEmpty()
+    }
+
+    @Test
+    fun selectNotForecast() {
+        saveWeather(isForecast = false)
+        assertThat(weatherRepository.list(1).size).isEqualTo(1)
+        assertThat(weatherRepository.list(1, forecast = false).size).isEqualTo(1)
+        assertThat(weatherRepository.list(1, forecast = true)).isEmpty()
+
     }
 
     @Test
@@ -34,8 +45,8 @@ class WeatherRepositoryTest(@Autowired val weatherRepository: WeatherRepository)
         assertThat(weatherRepository.locations()).isEqualTo(listOf(1L))
     }
 
-    private fun saveWeather() {
-        weatherRepository.save(Weather(1, ZonedDateTime.now(), 1.0, 2.0))
+    private fun saveWeather(isForecast: Boolean = true) {
+        weatherRepository.save(Weather(1, ZonedDateTime.now(), 1.0, 2.0, isForecast = isForecast))
     }
 
 

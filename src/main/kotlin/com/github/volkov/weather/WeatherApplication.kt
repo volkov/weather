@@ -18,8 +18,8 @@ class WeatherApplication(
 ) {
 
     @GetMapping("/{location}")
-    fun get(@PathVariable("location") location: Long): Any {
-        return weatherService.getWeather(location)
+    fun get(@PathVariable("location") location: Long, @RequestParam("forecast") forecast: Boolean?): Any {
+        return weatherService.getWeather(location, forecast)
     }
 
     @GetMapping("/{location}/diffs")

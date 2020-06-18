@@ -29,8 +29,8 @@ class WeatherService(val weatherClient: OpenWeatherClient, val weatherRepository
         logger.info("Updated.")
     }
 
-    fun getWeather(location: Long): List<Weather> {
-        val result = weatherRepository.list(location)
+    fun getWeather(location: Long, forecast: Boolean?): List<Weather> {
+        val result = weatherRepository.list(location, forecast=forecast)
         if (result.isNotEmpty()) {
             return result
         }
