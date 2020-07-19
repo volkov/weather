@@ -37,6 +37,13 @@ class WeatherService(val weatherClient: OpenWeatherClient, val weatherRepository
         return loadAndSave(location)
     }
 
+    fun loadAndSave(location: Long): List<Weather> {
+        val forecast = weatherClient.forecast(location).toMutableList()
+        forecast.add(weatherClient.current(location))
+        forecast.forEach { weatherRepository.save(it) }
+        return forecast
+    }
+
     fun getWeatherDiffs(location: Long, timestamp: ZonedDateTime?): List<WeatherWithDiff> {
         return weatherRepository.list(location, timestamp)
                 .groupBy { it.timestamp }
@@ -76,12 +83,8 @@ class WeatherService(val weatherClient: OpenWeatherClient, val weatherRepository
         return round(temperature * 10) / 10
     }
 
-    @Synchronized
-    fun loadAndSave(location: Long): List<Weather> {
-        val forecast = weatherClient.forecast(location).toMutableList()
-        forecast.add(weatherClient.current(location))
-        forecast.forEach { weatherRepository.save(it) }
-        return forecast
+    fun save(weather: Weather) {
+        weatherRepository.save(weather)
     }
 
 }

@@ -1,20 +1,21 @@
 package com.github.volkov.weather
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.format.annotation.DateTimeFormat
+import org.springframework.http.HttpStatus
 import org.springframework.scheduling.annotation.EnableScheduling
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 import java.time.ZonedDateTime
 
 @SpringBootApplication
 @EnableScheduling
 @RestController
 class WeatherApplication(
-        val weatherService: WeatherService
+        val weatherService: WeatherService,
+        @Value("\${SECRET:secret}") val secret: String
 ) {
 
     @GetMapping("/{location}")
@@ -28,6 +29,14 @@ class WeatherApplication(
             @RequestParam("timestamp", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) timestamp: ZonedDateTime?
     ): Any {
         return weatherService.getWeatherDiffs(location, timestamp)
+    }
+
+    @PutMapping("/")
+    fun putWeather(@RequestBody weather: Weather, @RequestHeader("secret") secret: String) {
+        if (secret != this.secret) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Security...")
+        }
+        weatherService.save(weather)
     }
 
 }

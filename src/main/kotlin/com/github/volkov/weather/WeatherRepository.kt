@@ -56,7 +56,7 @@ class WeatherRepository(val jdbcTemplate: NamedParameterJdbcTemplate) {
 
     fun locations(): List<Long> {
         return jdbcTemplate.queryForList(
-                "select distinct(location_id) from weather",
+                "select distinct(location_id) from weather where location_id > 0",
                 emptyMap<String, Any>(),
                 Long::class.java
         )
