@@ -18,12 +18,12 @@ class WeatherApplication(
         @Value("\${SECRET:secret}") val secret: String
 ) {
 
-    @GetMapping("/{location}")
+    @GetMapping("api/{location}")
     fun get(@PathVariable("location") location: Long, @RequestParam("forecast") forecast: Boolean?): Any {
         return weatherService.getWeather(location, forecast)
     }
 
-    @GetMapping("/{location}/diffs")
+    @GetMapping("api/{location}/diffs")
     fun getDiffs(
             @PathVariable("location") location: Long,
             @RequestParam("timestamp", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) timestamp: ZonedDateTime?
@@ -31,12 +31,17 @@ class WeatherApplication(
         return weatherService.getWeatherDiffs(location, timestamp)
     }
 
-    @PutMapping("/")
+    @PutMapping("api/")
     fun putWeather(@RequestBody weather: Weather, @RequestHeader("secret") secret: String) {
         if (secret != this.secret) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN, "Security...")
         }
         weatherService.save(weather)
+    }
+
+    @GetMapping("api/locations")
+    fun locations(): Any {
+        return weatherService.locations()
     }
 
 }

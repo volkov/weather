@@ -87,4 +87,8 @@ class WeatherService(val weatherClient: OpenWeatherClient, val weatherRepository
         weatherRepository.save(weather)
     }
 
+    fun locations(): List<Long> {
+        return weatherRepository.locations()
+    }
+
 }
