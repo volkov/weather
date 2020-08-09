@@ -44,8 +44,8 @@ class WeatherService(val weatherClient: OpenWeatherClient, val weatherRepository
         return forecast
     }
 
-    fun getWeatherDiffs(location: Long, timestamp: ZonedDateTime?): List<WeatherWithDiff> {
-        return weatherRepository.list(location, timestamp)
+    fun getWeatherDiffs(location: Long, from: ZonedDateTime?): List<WeatherWithDiff> {
+        return weatherRepository.list(location, from)
                 .groupBy { it.timestamp }
                 .mapValues { entry ->
                     val sortedWeather = entry.value.sortedByDescending { it.updated }

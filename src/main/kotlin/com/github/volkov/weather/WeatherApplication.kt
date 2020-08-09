@@ -26,9 +26,10 @@ class WeatherApplication(
     @GetMapping("api/{location}/diffs")
     fun getDiffs(
             @PathVariable("location") location: Long,
-            @RequestParam("timestamp", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) timestamp: ZonedDateTime?
+            @RequestParam("from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            from: ZonedDateTime?
     ): Any {
-        return weatherService.getWeatherDiffs(location, timestamp)
+        return weatherService.getWeatherDiffs(location, from ?: ZonedDateTime.now().minusDays(7))
     }
 
     @PutMapping("api/")

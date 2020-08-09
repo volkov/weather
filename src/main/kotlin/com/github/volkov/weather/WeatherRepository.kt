@@ -27,12 +27,12 @@ class WeatherRepository(val jdbcTemplate: NamedParameterJdbcTemplate) {
         )
     }
 
-    fun list(locationId: Long, timestamp: ZonedDateTime? = null, forecast: Boolean? = null): List<Weather> {
+    fun list(locationId: Long, from: ZonedDateTime? = null, forecast: Boolean? = null): List<Weather> {
         var query = "select * from weather where location_id = :locationId"
         val params = mutableMapOf<String, Any>("locationId" to locationId)
-        if (timestamp != null) {
-            query += " and timestamp = :timestamp"
-            params["timestamp"] = timestamp.toTimestamp()
+        if (from != null) {
+            query += " and timestamp >= :timestamp"
+            params["timestamp"] = from.toTimestamp()
         }
         if (forecast != null) {
             query += " and forecast = :forecast"
