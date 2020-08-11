@@ -55,7 +55,7 @@ class WeatherService(val weatherClient: OpenWeatherClient, val weatherRepository
                             diffs = getDiffs(latestWeather, sortedWeather.drop(1))
                     )
                 }
-                .values.toList()
+                .values.sortedBy { it.weather.timestamp }.toList()
     }
 
     private fun getDiffs(latestWeather: Weather, sortedWeathers: List<Weather>): List<WeatherDiff> {
