@@ -30,7 +30,7 @@ class WeatherService(val weatherClient: OpenWeatherClient, val weatherRepository
     }
 
     fun getWeather(location: Long, forecast: Boolean?): List<Weather> {
-        val result = weatherRepository.list(location, forecast=forecast)
+        val result = weatherRepository.list(location, forecast = forecast)
         if (result.isNotEmpty()) {
             return result
         }
@@ -89,6 +89,17 @@ class WeatherService(val weatherClient: OpenWeatherClient, val weatherRepository
 
     fun locations(): List<Long> {
         return weatherRepository.locations()
+    }
+
+    fun getForecast(location: Long, duration: Duration, from: ZonedDateTime): List<Weather> {
+        if (duration.isZero) {
+            return weatherRepository.list(location, from, false).sortedBy { it.timestamp }
+        }
+        return weatherRepository.list(location, from, true)
+                .groupBy { it.timestamp }
+                .values.mapNotNull { values ->
+                    values.sortedByDescending { it.updated }.firstOrNull { it.updated.plus(duration).isBefore(it.timestamp) }
+                }.sortedBy { it.timestamp }
     }
 
 }

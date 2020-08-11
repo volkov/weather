@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import java.time.Duration
 import java.time.ZonedDateTime
 
 @SpringBootApplication
@@ -30,6 +31,16 @@ class WeatherApplication(
             from: ZonedDateTime?
     ): Any {
         return weatherService.getWeatherDiffs(location, from ?: ZonedDateTime.now().minusDays(7))
+    }
+
+    @GetMapping("api/{location}/forecast")
+    fun getForecast(
+            @PathVariable("location") location: Long,
+            @RequestParam("duration", required = false) duration: Duration?,
+            @RequestParam("from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            from: ZonedDateTime?
+    ): Any {
+        return weatherService.getForecast(location, duration ?: Duration.ZERO, from ?: ZonedDateTime.now().minusDays(7))
     }
 
     @PutMapping("api/")
