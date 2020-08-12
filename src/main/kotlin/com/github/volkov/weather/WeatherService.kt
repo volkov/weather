@@ -10,7 +10,9 @@ import java.time.temporal.ChronoUnit
 import kotlin.math.round
 
 @Component
-class WeatherService(val weatherClient: OpenWeatherClient, val weatherRepository: WeatherRepository) {
+class WeatherService(val weatherClient: OpenWeatherClient,
+                     val weatherRepository: WeatherRepository,
+                     val cityRepository: CityRepository) {
 
     val logger: Logger = LoggerFactory.getLogger(javaClass)
 
@@ -87,8 +89,8 @@ class WeatherService(val weatherClient: OpenWeatherClient, val weatherRepository
         weatherRepository.save(weather)
     }
 
-    fun locations(): List<Long> {
-        return weatherRepository.locations()
+    fun locations(): List<NamedLocation> {
+        return cityRepository.getNames(weatherRepository.locations())
     }
 
     fun getForecast(location: Long, duration: Duration, from: ZonedDateTime): List<Weather> {
