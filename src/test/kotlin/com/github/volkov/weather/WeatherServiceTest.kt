@@ -11,7 +11,7 @@ class WeatherServiceTest {
     @Test
     fun diff() {
         val weatherRepository = mock(WeatherRepository::class.java)
-        val service = WeatherService(mock(OpenWeatherClient::class.java), weatherRepository)
+        val service = WeatherService(mock(OpenWeatherClient::class.java), weatherRepository, mock(CityRepository::class.java))
 
         val forecastTimestmap = ZonedDateTime.now()
         val weather1 = Weather(1, forecastTimestmap, 1.0, 0.0, forecastTimestmap)
