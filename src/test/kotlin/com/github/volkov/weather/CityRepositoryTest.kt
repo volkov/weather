@@ -16,7 +16,7 @@ class CityRepositoryTest (@Autowired val repository: CityRepository) {
 
     @Test
     fun test() {
-        assertThat(repository.getName(498817)).isEqualTo("Saint Petersburg")
+        assertThat(repository.getName(498817).name).isEqualTo("Saint Petersburg")
     }
 
 }

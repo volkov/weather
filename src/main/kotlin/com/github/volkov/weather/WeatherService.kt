@@ -93,6 +93,10 @@ class WeatherService(val weatherClient: OpenWeatherClient,
         return cityRepository.getNames(weatherRepository.locations())
     }
 
+    fun location(location: Long): NamedLocation {
+        return cityRepository.getName(location)
+    }
+
     fun getForecast(location: Long, duration: Duration, from: ZonedDateTime): List<Weather> {
         if (duration.isZero) {
             return weatherRepository.list(location, from, false).sortedBy { it.timestamp }
@@ -103,5 +107,6 @@ class WeatherService(val weatherClient: OpenWeatherClient,
                     values.sortedByDescending { it.updated }.firstOrNull { it.updated.plus(duration).isBefore(it.timestamp) }
                 }.sortedBy { it.timestamp }
     }
+
 
 }

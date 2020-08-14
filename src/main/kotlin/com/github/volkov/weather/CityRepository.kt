@@ -24,12 +24,12 @@ class CityRepository(@Value("classpath:city.list.json.gz") cityList: Resource) {
         }
     }
 
-    fun getName(location: Long): String {
-        return data.getValue(location)
+    fun getName(location: Long): NamedLocation {
+        return NamedLocation(location, data.getValue(location))
     }
 
     fun getNames(locations: List<Long>): List<NamedLocation> {
-        return locations.map { NamedLocation(it, getName(it)) }
+        return locations.map { getName(it) }
     }
 
 

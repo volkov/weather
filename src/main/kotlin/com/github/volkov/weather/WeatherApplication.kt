@@ -56,6 +56,11 @@ class WeatherApplication(
         return weatherService.locations()
     }
 
+    @GetMapping("api/location/{location}")
+    fun location(@PathVariable("location") location: Long): Any {
+        return weatherService.location(location)
+    }
+
 }
 
 fun main(args: Array<String>) {
