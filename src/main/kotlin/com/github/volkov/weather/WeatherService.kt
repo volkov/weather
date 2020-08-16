@@ -102,15 +102,14 @@ class WeatherService(val weatherClient: OpenWeatherClient,
     }
 
     private fun getForecastData(duration: Duration, location: Long, from: ZonedDateTime): List<Weather> {
-        return if (duration.isZero) {
-            weatherRepository.list(location, from, false)
-        } else {
-            weatherRepository.list(location, from, true)
-                    .groupBy { it.timestamp }
-                    .values.mapNotNull { values ->
-                        values.sortedByDescending { it.updated }.firstOrNull { it.updated.plus(duration).isBefore(it.timestamp) }
-                    }
+        if (duration.isZero) {
+            return weatherRepository.list(location, from, false)
         }
+        return weatherRepository.list(location, from, true)
+                .groupBy { it.timestamp }
+                .values.mapNotNull { values ->
+                    values.sortedByDescending { it.updated }.firstOrNull { it.updated.plus(duration).isBefore(it.timestamp) }
+                }
     }
 
     fun List<Weather>.addNulls(duration: Duration?): List<Weather> {
