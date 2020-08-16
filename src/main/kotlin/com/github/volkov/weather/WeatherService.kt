@@ -69,8 +69,8 @@ class WeatherService(val weatherClient: OpenWeatherClient,
             }
             result.add(WeatherDiff(
                     timeDelta = truncatedDuration(latestWeather.updated, weather.updated),
-                    temperatureDelta = roundTemperature(weather.temperature - latestWeather.temperature),
-                    rainDelta = weather.rain - latestWeather.rain
+                    temperatureDelta = roundTemperature(weather.temperature!! - latestWeather.temperature!!),
+                    rainDelta = weather.rain!! - latestWeather.rain!!
             ))
             previous = weather
         }
@@ -98,15 +98,34 @@ class WeatherService(val weatherClient: OpenWeatherClient,
     }
 
     fun getForecast(location: Long, duration: Duration, from: ZonedDateTime): List<Weather> {
-        if (duration.isZero) {
-            return weatherRepository.list(location, from, false).sortedBy { it.timestamp }
-        }
-        return weatherRepository.list(location, from, true)
-                .groupBy { it.timestamp }
-                .values.mapNotNull { values ->
-                    values.sortedByDescending { it.updated }.firstOrNull { it.updated.plus(duration).isBefore(it.timestamp) }
-                }.sortedBy { it.timestamp }
+        return getForecastData(duration, location, from).sortedBy { it.timestamp }.addNulls(Duration.ofHours(3))
     }
 
+    private fun getForecastData(duration: Duration, location: Long, from: ZonedDateTime): List<Weather> {
+        return if (duration.isZero) {
+            weatherRepository.list(location, from, false)
+        } else {
+            weatherRepository.list(location, from, true)
+                    .groupBy { it.timestamp }
+                    .values.mapNotNull { values ->
+                        values.sortedByDescending { it.updated }.firstOrNull { it.updated.plus(duration).isBefore(it.timestamp) }
+                    }
+        }
+    }
+
+    fun List<Weather>.addNulls(duration: Duration?): List<Weather> {
+        val result = ArrayList<Weather>()
+        var prev: Weather? = null
+        for (item in this) {
+            if (prev != null && Duration.between(prev.timestamp, item.timestamp) > duration) {
+                result.add(Weather(item.locationId, prev.timestamp.plus(duration), null, null))
+            }
+            result.add(item)
+            prev = item
+        }
+        return result
+    }
 
 }
+
+

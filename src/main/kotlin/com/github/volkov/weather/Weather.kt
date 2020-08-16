@@ -6,8 +6,8 @@ import java.time.ZonedDateTime
 data class Weather(
         val locationId: Long,
         val timestamp: ZonedDateTime,
-        val temperature: Double,
-        val rain: Double,
+        val temperature: Double?,
+        val rain: Double?,
         val updated: ZonedDateTime = ZonedDateTime.now(),
         val isForecast: Boolean = true
 )
