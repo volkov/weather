@@ -16,7 +16,8 @@ import java.time.ZonedDateTime
 @RestController
 class WeatherApplication(
         val weatherService: WeatherService,
-        @Value("\${SECRET:secret}") val secret: String
+        @Value("\${SECRET:secret}") val secret: String,
+        @Value("\${DEFAULT_DURATION:P14D}") val defaultDuration: Duration
 ) {
 
     @GetMapping("api/{location}")
@@ -30,7 +31,7 @@ class WeatherApplication(
             @RequestParam("from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             from: ZonedDateTime?
     ): Any {
-        return weatherService.getWeatherDiffs(location, from ?: ZonedDateTime.now().minusDays(7))
+        return weatherService.getWeatherDiffs(location, getFromOrDefault(from))
     }
 
     @GetMapping("api/{location}/forecast")
@@ -40,8 +41,10 @@ class WeatherApplication(
             @RequestParam("from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             from: ZonedDateTime?
     ): Any {
-        return weatherService.getForecast(location, duration ?: Duration.ZERO, from ?: ZonedDateTime.now().minusDays(7))
+        return weatherService.getForecast(location, duration ?: Duration.ZERO, getFromOrDefault(from))
     }
+
+    private fun getFromOrDefault(from: ZonedDateTime?) = from ?: ZonedDateTime.now().minus(defaultDuration)
 
     @PutMapping("api/")
     fun putWeather(@RequestBody weather: Weather, @RequestHeader("secret") secret: String) {
