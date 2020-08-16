@@ -21,7 +21,7 @@ class OpenWeatherClient(@Value("\${OPENWEATHER_TOKEN:}") val token: String) {
     }
 
     private fun fromJson(id: Long, isForecast: Boolean, it: JsonNode): Weather {
-        val rain = it["rain"]?.get("3h")?.asDouble() ?: 0.0
+        val rain = rainValue(it)
         return Weather(
                 locationId = id,
                 timestamp = it["dt"].intValue().toZonedDateTime(),
@@ -36,3 +36,8 @@ class OpenWeatherClient(@Value("\${OPENWEATHER_TOKEN:}") val token: String) {
     }
 
 }
+
+fun rainValue(it: JsonNode): Double =
+        it["rain"]?.let {
+            it.get("3h")?.asDouble() ?: it.get("1h")?.asDouble()?.times(3)
+        } ?: 0.0
