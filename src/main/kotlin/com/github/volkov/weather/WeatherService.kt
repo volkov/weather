@@ -2,6 +2,7 @@ package com.github.volkov.weather
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.time.Duration
@@ -12,7 +13,8 @@ import kotlin.math.round
 @Component
 class WeatherService(val weatherClient: OpenWeatherClient,
                      val weatherRepository: WeatherRepository,
-                     val cityRepository: CityRepository) {
+                     val cityRepository: CityRepository,
+                     @Value("\${GAP_DURATION:PT3H}") val gapDuration: Duration) {
 
     val logger: Logger = LoggerFactory.getLogger(javaClass)
 
@@ -98,7 +100,10 @@ class WeatherService(val weatherClient: OpenWeatherClient,
     }
 
     fun getForecast(location: Long, duration: Duration, from: ZonedDateTime): List<Weather> {
-        return getForecastData(duration, location, from).sortedBy { it.timestamp }.addNulls(Duration.ofHours(3))
+        return getForecastData(duration, location, from)
+                .sortedBy { it.timestamp }
+                .sample(gapDuration)
+                .addNulls(gapDuration)
     }
 
     private fun getForecastData(duration: Duration, location: Long, from: ZonedDateTime): List<Weather> {
@@ -111,20 +116,49 @@ class WeatherService(val weatherClient: OpenWeatherClient,
                     values.sortedByDescending { it.updated }.firstOrNull { it.updated.plus(duration).isBefore(it.timestamp) }
                 }
     }
-
-    fun List<Weather>.addNulls(duration: Duration?): List<Weather> {
-        val result = ArrayList<Weather>()
-        var prev: Weather? = null
-        for (item in this) {
-            if (prev != null && Duration.between(prev.timestamp, item.timestamp) > duration) {
-                result.add(Weather(item.locationId, prev.timestamp.plus(duration), null, null))
-            }
-            result.add(item)
-            prev = item
-        }
-        return result
-    }
-
 }
 
+fun List<Weather>.sample(duration: Duration): List<Weather> {
+    val result = ArrayList<Weather>()
+    var prev: Weather? = null
+    var candidate: Weather? = null
+    for (item in this) {
+        if (prev == null) {
+            result.add(item)
+            prev = item
+            continue
+        }
+        if (Duration.between(prev.timestamp, item.timestamp) <= duration) {
+            candidate = item
+            continue
+        }
+        if (candidate != null) {
+            result.add(candidate)
+            prev = candidate
+            candidate = null
+            if (Duration.between(prev.timestamp, item.timestamp) > duration) {
+                result.add(item)
+                prev = item
+            } else {
+                candidate = item
+            }
+        }
+    }
+    if (candidate != null) {
+        result.add(candidate)
+    }
+    return result
+}
 
+fun List<Weather>.addNulls(duration: Duration): List<Weather> {
+    val result = ArrayList<Weather>()
+    var prev: Weather? = null
+    for (item in this) {
+        if (prev != null && Duration.between(prev.timestamp, item.timestamp) > duration) {
+            result.add(Weather(item.locationId, prev.timestamp.plus(duration), null, null))
+        }
+        result.add(item)
+        prev = item
+    }
+    return result
+}
