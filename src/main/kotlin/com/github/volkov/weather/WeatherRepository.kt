@@ -15,13 +15,14 @@ class WeatherRepository(val jdbcTemplate: NamedParameterJdbcTemplate) {
 
     fun save(weather: Weather) {
         jdbcTemplate.update(
-                "insert into weather (location_id, timestamp, temperature, rain, updated, forecast)" +
-                        " values (:locationId, :timestamp, :temperature, :rain, :updated, :forecast)",
+                "insert into weather (location_id, timestamp, temperature, rain, clouds, updated, forecast)" +
+                        " values (:locationId, :timestamp, :temperature, :rain, :clouds, :updated, :forecast)",
                 mapOf(
                         "locationId" to weather.locationId,
                         "timestamp" to weather.timestamp.toTimestamp(),
                         "temperature" to weather.temperature,
                         "rain" to weather.rain,
+                        "clouds" to weather.clouds,
                         "updated" to weather.updated.toTimestamp(),
                         "forecast" to weather.isForecast
                 )
@@ -64,6 +65,7 @@ class WeatherRepository(val jdbcTemplate: NamedParameterJdbcTemplate) {
                     timestamp = rs.getTimestamp("timestamp").toZonedDateTime(),
                     temperature = rs.getDouble("temperature"),
                     rain = rs.getDouble("rain"),
+                    clouds = rs.getInt("clouds"),
                     updated = rs.getTimestamp("updated").toZonedDateTime(),
                     isForecast = rs.getBoolean("forecast")
 

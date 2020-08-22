@@ -26,6 +26,7 @@ class OpenWeatherClient(@Value("\${OPENWEATHER_TOKEN:}") val token: String) {
                 locationId = id,
                 timestamp = it["dt"].intValue().toZonedDateTime(),
                 temperature = it["main"]["temp"].doubleValue(),
+                clouds = it["clouds"]["all"].intValue(),
                 rain = rain,
                 isForecast = isForecast
         )

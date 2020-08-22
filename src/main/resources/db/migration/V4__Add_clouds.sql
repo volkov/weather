@@ -1,0 +1,1 @@
+alter table weather add column clouds int;

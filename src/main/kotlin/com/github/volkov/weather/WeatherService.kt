@@ -155,7 +155,7 @@ fun List<Weather>.addNulls(duration: Duration): List<Weather> {
     var prev: Weather? = null
     for (item in this) {
         if (prev != null && Duration.between(prev.timestamp, item.timestamp) > duration) {
-            result.add(Weather(item.locationId, prev.timestamp.plus(duration), null, null))
+            result.add(Weather(item.locationId, prev.timestamp.plus(duration), null, null, null))
         }
         result.add(item)
         prev = item

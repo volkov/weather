@@ -59,6 +59,7 @@ class WeatherRepositoryTest(@Autowired val weatherRepository: WeatherRepository)
                 timestamp,
                 1.0,
                 2.0,
+                clouds = 1,
                 isForecast = isForecast,
                 updated = timestamp.minus(updateDuration)
         ))

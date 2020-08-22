@@ -49,5 +49,9 @@ class WeatherServiceTest {
         assertThat(weatherList.sample(Duration.ofHours(2))).isEqualTo(listOf(w1, w3, w4, w6))
     }
 
-    private fun createWeather(timestamp: ZonedDateTime, temperature: Double, updated: ZonedDateTime = timestamp) = Weather(1, timestamp, temperature, 0.0, updated)
+    private fun createWeather(
+            timestamp: ZonedDateTime,
+            temperature: Double,
+            updated: ZonedDateTime = timestamp
+    ) = Weather(1, timestamp, temperature, 0.0, 0, updated)
 }
