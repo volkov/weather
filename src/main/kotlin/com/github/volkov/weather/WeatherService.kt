@@ -110,7 +110,7 @@ class WeatherService(val weatherClient: OpenWeatherClient,
         if (duration.isZero) {
             return weatherRepository.list(location, from, false)
         }
-        return weatherRepository.list(location, from, true)
+        return weatherRepository.list(location, from, true, duration, duration + gapDuration)
                 .groupBy { it.timestamp }
                 .values.mapNotNull { values ->
                     values.sortedByDescending { it.updated }.firstOrNull { it.updated.plus(duration).isBefore(it.timestamp) }

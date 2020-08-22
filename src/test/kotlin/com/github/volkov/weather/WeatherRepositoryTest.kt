@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.transaction.annotation.Transactional
+import java.time.Duration
 import java.time.ZonedDateTime
 
 
@@ -36,7 +37,13 @@ class WeatherRepositoryTest(@Autowired val weatherRepository: WeatherRepository)
         assertThat(weatherRepository.list(1).size).isEqualTo(1)
         assertThat(weatherRepository.list(1, forecast = false).size).isEqualTo(1)
         assertThat(weatherRepository.list(1, forecast = true)).isEmpty()
+    }
 
+    @Test
+    fun selectMinInterval() {
+        saveWeather(updateDuration = Duration.ofHours(3))
+        assertThat(weatherRepository.list(1, minDiff = Duration.ofHours(4))).isEmpty()
+        assertThat(weatherRepository.list(1, minDiff = Duration.ofHours(2)).size).isEqualTo(1)
     }
 
     @Test
@@ -45,8 +52,16 @@ class WeatherRepositoryTest(@Autowired val weatherRepository: WeatherRepository)
         assertThat(weatherRepository.locations()).isEqualTo(listOf(1L))
     }
 
-    private fun saveWeather(isForecast: Boolean = true) {
-        weatherRepository.save(Weather(1, ZonedDateTime.now(), 1.0, 2.0, isForecast = isForecast))
+    private fun saveWeather(isForecast: Boolean = true, updateDuration: Duration = Duration.ZERO) {
+        val timestamp = ZonedDateTime.now()
+        weatherRepository.save(Weather(
+                1,
+                timestamp,
+                1.0,
+                2.0,
+                isForecast = isForecast,
+                updated = timestamp.minus(updateDuration)
+        ))
     }
 
 
