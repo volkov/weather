@@ -11,10 +11,12 @@ import java.time.temporal.ChronoUnit
 import kotlin.math.round
 
 @Component
-class WeatherService(val weatherClient: OpenWeatherClient,
-                     val weatherRepository: WeatherRepository,
-                     val cityRepository: CityRepository,
-                     @Value("\${GAP_DURATION:PT3H}") val gapDuration: Duration) {
+class WeatherService(
+    val weatherClient: OpenWeatherClient,
+    val weatherRepository: WeatherRepository,
+    val cityRepository: CityRepository,
+    @Value("\${GAP_DURATION:PT3H}") val gapDuration: Duration,
+) {
 
     val logger: Logger = LoggerFactory.getLogger(javaClass)
 
@@ -50,16 +52,16 @@ class WeatherService(val weatherClient: OpenWeatherClient,
 
     fun getWeatherDiffs(location: Long, from: ZonedDateTime?): List<WeatherWithDiff> {
         return weatherRepository.list(location, from)
-                .groupBy { it.timestamp }
-                .mapValues { entry ->
-                    val sortedWeather = entry.value.sortedByDescending { it.updated }
-                    val latestWeather = sortedWeather[0]
-                    WeatherWithDiff(
-                            weather = latestWeather,
-                            diffs = getDiffs(latestWeather, sortedWeather.drop(1))
-                    )
-                }
-                .values.sortedBy { it.weather.timestamp }.toList()
+            .groupBy { it.timestamp }
+            .mapValues { entry ->
+                val sortedWeather = entry.value.sortedByDescending { it.updated }
+                val latestWeather = sortedWeather[0]
+                WeatherWithDiff(
+                    weather = latestWeather,
+                    diffs = getDiffs(latestWeather, sortedWeather.drop(1)),
+                )
+            }
+            .values.sortedBy { it.weather.timestamp }.toList()
     }
 
     private fun getDiffs(latestWeather: Weather, sortedWeathers: List<Weather>): List<WeatherDiff> {
@@ -69,11 +71,13 @@ class WeatherService(val weatherClient: OpenWeatherClient,
             if (previous != null && previous.temperature == weather.temperature && previous.rain == weather.rain) {
                 continue
             }
-            result.add(WeatherDiff(
+            result.add(
+                WeatherDiff(
                     timeDelta = truncatedDuration(latestWeather.updated, weather.updated),
                     temperatureDelta = roundTemperature(weather.temperature!! - latestWeather.temperature!!),
-                    rainDelta = weather.rain!! - latestWeather.rain!!
-            ))
+                    rainDelta = weather.rain!! - latestWeather.rain!!,
+                ),
+            )
             previous = weather
         }
 
@@ -81,7 +85,7 @@ class WeatherService(val weatherClient: OpenWeatherClient,
     }
 
     private fun truncatedDuration(from: ZonedDateTime, to: ZonedDateTime) =
-            Duration.between(from.truncatedTo(ChronoUnit.MINUTES), to.truncatedTo(ChronoUnit.MINUTES))
+        Duration.between(from.truncatedTo(ChronoUnit.MINUTES), to.truncatedTo(ChronoUnit.MINUTES))
 
     private fun roundTemperature(temperature: Double): Double {
         return round(temperature * 10) / 10
@@ -101,9 +105,9 @@ class WeatherService(val weatherClient: OpenWeatherClient,
 
     fun getForecast(location: Long, duration: Duration, from: ZonedDateTime): List<Weather> {
         return getForecastData(duration, location, from)
-                .sortedBy { it.timestamp }
-                .sample(gapDuration)
-                .addNulls(gapDuration)
+            .sortedBy { it.timestamp }
+            .sample(gapDuration)
+            .addNulls(gapDuration)
     }
 
     private fun getForecastData(duration: Duration, location: Long, from: ZonedDateTime): List<Weather> {
@@ -111,10 +115,10 @@ class WeatherService(val weatherClient: OpenWeatherClient,
             return weatherRepository.list(location, from, false)
         }
         return weatherRepository.list(location, from, true, duration, duration + gapDuration)
-                .groupBy { it.timestamp }
-                .values.mapNotNull { values ->
-                    values.sortedByDescending { it.updated }.firstOrNull { it.updated.plus(duration).isBefore(it.timestamp) }
-                }
+            .groupBy { it.timestamp }
+            .values.mapNotNull { values ->
+                values.sortedByDescending { it.updated }.firstOrNull { it.updated.plus(duration).isBefore(it.timestamp) }
+            }
     }
 }
 

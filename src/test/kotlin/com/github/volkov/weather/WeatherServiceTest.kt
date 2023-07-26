@@ -17,21 +17,25 @@ class WeatherServiceTest {
         val weather1 = createWeather(forecastTimestmap, 1.0, forecastTimestmap)
         val weather2 = createWeather(forecastTimestmap, 2.0, forecastTimestmap.minusMinutes(1))
         val weather3 = createWeather(forecastTimestmap, 2.0, forecastTimestmap.minusMinutes(2))
-        Mockito.`when`(weatherRepository.list(1)).thenReturn(listOf(
+        Mockito.`when`(weatherRepository.list(1)).thenReturn(
+            listOf(
                 weather1,
                 weather2,
-                weather3
-        ))
+                weather3,
+            ),
+        )
 
         val weatherDiffs = service.getWeatherDiffs(1, null)
-        assertThat(weatherDiffs).isEqualTo(listOf(
+        assertThat(weatherDiffs).isEqualTo(
+            listOf(
                 WeatherWithDiff(
-                        weather1,
-                        listOf(
-                                WeatherDiff(Duration.ofMinutes(-2), 1.0, 0.0)
-                        )
-                )
-        ))
+                    weather1,
+                    listOf(
+                        WeatherDiff(Duration.ofMinutes(-2), 1.0, 0.0),
+                    ),
+                ),
+            ),
+        )
     }
 
     @Test
@@ -50,8 +54,8 @@ class WeatherServiceTest {
     }
 
     private fun createWeather(
-            timestamp: ZonedDateTime,
-            temperature: Double,
-            updated: ZonedDateTime = timestamp
+        timestamp: ZonedDateTime,
+        temperature: Double,
+        updated: ZonedDateTime = timestamp,
     ) = Weather(1, timestamp, temperature, 0.0, 0, updated)
 }

@@ -6,7 +6,13 @@ import org.springframework.boot.runApplication
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.scheduling.annotation.EnableScheduling
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 import java.time.Duration
 import java.time.ZonedDateTime
@@ -15,9 +21,9 @@ import java.time.ZonedDateTime
 @EnableScheduling
 @RestController
 class WeatherApplication(
-        val weatherService: WeatherService,
-        @Value("\${SECRET:secret}") val secret: String,
-        @Value("\${DEFAULT_DURATION:P14D}") val defaultDuration: Duration
+    val weatherService: WeatherService,
+    @Value("\${SECRET:secret}") val secret: String,
+    @Value("\${DEFAULT_DURATION:P14D}") val defaultDuration: Duration,
 ) {
 
     @GetMapping("api/{location}")
@@ -27,19 +33,21 @@ class WeatherApplication(
 
     @GetMapping("api/{location}/diffs")
     fun getDiffs(
-            @PathVariable("location") location: Long,
-            @RequestParam("from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            from: ZonedDateTime?
+        @PathVariable("location") location: Long,
+        @RequestParam("from", required = false)
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+        from: ZonedDateTime?,
     ): Any {
         return weatherService.getWeatherDiffs(location, getFromOrDefault(from))
     }
 
     @GetMapping("api/{location}/forecast")
     fun getForecast(
-            @PathVariable("location") location: Long,
-            @RequestParam("duration", required = false) duration: Duration?,
-            @RequestParam("from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            from: ZonedDateTime?
+        @PathVariable("location") location: Long,
+        @RequestParam("duration", required = false) duration: Duration?,
+        @RequestParam("from", required = false)
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+        from: ZonedDateTime?,
     ): Any {
         return weatherService.getForecast(location, duration ?: Duration.ZERO, getFromOrDefault(from))
     }
@@ -63,7 +71,6 @@ class WeatherApplication(
     fun location(@PathVariable("location") location: Long): Any {
         return weatherService.location(location)
     }
-
 }
 
 fun main(args: Array<String>) {

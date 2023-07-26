@@ -11,13 +11,13 @@ import java.time.ZonedDateTime
  * Time: 5:04 PM
  */
 fun Timestamp.toZonedDateTime(): ZonedDateTime =
-        ZonedDateTime.ofInstant(toInstant(), ZoneId.systemDefault())
+    ZonedDateTime.ofInstant(toInstant(), ZoneId.systemDefault())
 
 fun ZonedDateTime.toTimestamp(): Timestamp =
-        Timestamp.from(toInstant())
+    Timestamp.from(toInstant())
 
 fun Int.toZonedDateTime(): ZonedDateTime =
-        ZonedDateTime.ofInstant(
-                Instant.ofEpochSecond(toLong()),
-                ZoneId.systemDefault()
-        )
+    ZonedDateTime.ofInstant(
+        Instant.ofEpochSecond(toLong()),
+        ZoneId.systemDefault(),
+    )

@@ -19,8 +19,8 @@ class CityRepository(@Value("classpath:city.list.json.gz") cityList: Resource) {
     init {
         data = GZIPInputStream(cityList.inputStream).use { stream ->
             ObjectMapper().readTree(stream)
-                    .groupBy { it["id"].longValue() }
-                    .mapValues { it.value[0]["name"].textValue() }
+                .groupBy { it["id"].longValue() }
+                .mapValues { it.value[0]["name"].textValue() }
         }
     }
 
@@ -31,8 +31,6 @@ class CityRepository(@Value("classpath:city.list.json.gz") cityList: Resource) {
     fun getNames(locations: List<Long>): List<NamedLocation> {
         return locations.map { getName(it) }
     }
-
-
 }
 
 data class NamedLocation(val id: Long, val name: String)

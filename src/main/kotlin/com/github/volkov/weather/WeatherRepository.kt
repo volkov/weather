@@ -15,26 +15,26 @@ class WeatherRepository(val jdbcTemplate: NamedParameterJdbcTemplate) {
 
     fun save(weather: Weather) {
         jdbcTemplate.update(
-                "insert into weather (location_id, timestamp, temperature, rain, clouds, updated, forecast)" +
-                        " values (:locationId, :timestamp, :temperature, :rain, :clouds, :updated, :forecast)",
-                mapOf(
-                        "locationId" to weather.locationId,
-                        "timestamp" to weather.timestamp.toTimestamp(),
-                        "temperature" to weather.temperature,
-                        "rain" to weather.rain,
-                        "clouds" to weather.clouds,
-                        "updated" to weather.updated.toTimestamp(),
-                        "forecast" to weather.isForecast
-                )
+            "insert into weather (location_id, timestamp, temperature, rain, clouds, updated, forecast)" +
+                " values (:locationId, :timestamp, :temperature, :rain, :clouds, :updated, :forecast)",
+            mapOf(
+                "locationId" to weather.locationId,
+                "timestamp" to weather.timestamp.toTimestamp(),
+                "temperature" to weather.temperature,
+                "rain" to weather.rain,
+                "clouds" to weather.clouds,
+                "updated" to weather.updated.toTimestamp(),
+                "forecast" to weather.isForecast,
+            ),
         )
     }
 
     fun list(
-            locationId: Long,
-            from: ZonedDateTime? = null,
-            forecast: Boolean? = null,
-            minDiff: Duration? = null,
-            maxDiff: Duration? = null
+        locationId: Long,
+        from: ZonedDateTime? = null,
+        forecast: Boolean? = null,
+        minDiff: Duration? = null,
+        maxDiff: Duration? = null,
     ): List<Weather> {
         var query = "select * from weather where location_id = :locationId"
         val params = mutableMapOf<String, Any>("locationId" to locationId)
@@ -55,19 +55,18 @@ class WeatherRepository(val jdbcTemplate: NamedParameterJdbcTemplate) {
             params["maxDiff"] = maxDiff.toString()
         }
 
-
         return jdbcTemplate.query(
-                query,
-                params
+            query,
+            params,
         ) { rs, _ ->
             Weather(
-                    locationId = rs.getLong("location_id"),
-                    timestamp = rs.getTimestamp("timestamp").toZonedDateTime(),
-                    temperature = rs.getDouble("temperature"),
-                    rain = rs.getDouble("rain"),
-                    clouds = rs.getInt("clouds"),
-                    updated = rs.getTimestamp("updated").toZonedDateTime(),
-                    isForecast = rs.getBoolean("forecast")
+                locationId = rs.getLong("location_id"),
+                timestamp = rs.getTimestamp("timestamp").toZonedDateTime(),
+                temperature = rs.getDouble("temperature"),
+                rain = rs.getDouble("rain"),
+                clouds = rs.getInt("clouds"),
+                updated = rs.getTimestamp("updated").toZonedDateTime(),
+                isForecast = rs.getBoolean("forecast"),
 
             )
         }
@@ -75,10 +74,9 @@ class WeatherRepository(val jdbcTemplate: NamedParameterJdbcTemplate) {
 
     fun locations(): List<Long> {
         return jdbcTemplate.queryForList(
-                "select distinct(location_id) from weather where location_id > 0",
-                emptyMap<String, Any>(),
-                Long::class.java
+            "select distinct(location_id) from weather where location_id > 0",
+            emptyMap<String, Any>(),
+            Long::class.java,
         )
     }
-
 }

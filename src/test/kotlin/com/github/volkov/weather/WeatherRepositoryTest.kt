@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.Duration
 import java.time.ZonedDateTime
 
-
 /**
  * User: serg-v
  * Date: 6/12/20
@@ -54,16 +53,16 @@ class WeatherRepositoryTest(@Autowired val weatherRepository: WeatherRepository)
 
     private fun saveWeather(isForecast: Boolean = true, updateDuration: Duration = Duration.ZERO) {
         val timestamp = ZonedDateTime.now()
-        weatherRepository.save(Weather(
+        weatherRepository.save(
+            Weather(
                 1,
                 timestamp,
                 1.0,
                 2.0,
                 clouds = 1,
                 isForecast = isForecast,
-                updated = timestamp.minus(updateDuration)
-        ))
+                updated = timestamp.minus(updateDuration),
+            ),
+        )
     }
-
-
 }
