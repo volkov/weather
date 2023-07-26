@@ -46,7 +46,7 @@ class WeatherService(
     fun loadAndSave(location: Long): List<Weather> {
         val forecast = weatherClient.forecast(location).toMutableList()
         forecast.add(weatherClient.current(location))
-        forecast.forEach { weatherRepository.save(it) }
+        forecast.forEach { save(it) }
         return forecast
     }
 
