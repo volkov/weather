@@ -1,11 +1,9 @@
 package com.github.volkov.weather
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.transaction.annotation.Transactional
 import java.time.Duration
 import java.time.ZonedDateTime
 
@@ -69,5 +67,4 @@ class WeatherRepositoryTest(@Autowired val weatherRepository: WeatherRepository)
             ),
         )
     }
-
 }
