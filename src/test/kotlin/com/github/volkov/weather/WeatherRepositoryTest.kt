@@ -3,7 +3,6 @@ package com.github.volkov.weather
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.transaction.annotation.Transactional
 import java.time.Duration
 import java.time.ZonedDateTime
@@ -13,9 +12,8 @@ import java.time.ZonedDateTime
  * Date: 6/12/20
  * Time: 2:13 AM
  */
-@SpringBootTest
 @Transactional
-class WeatherRepositoryTest(@Autowired val weatherRepository: WeatherRepository) {
+class WeatherRepositoryTest(@Autowired val weatherRepository: WeatherRepository) : WeatherApplicationBaseTest() {
 
     @Test
     fun insert() {
