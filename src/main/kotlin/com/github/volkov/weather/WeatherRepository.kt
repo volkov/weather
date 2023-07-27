@@ -79,4 +79,8 @@ class WeatherRepository(val jdbcTemplate: NamedParameterJdbcTemplate) {
             Long::class.java,
         )
     }
+
+    fun truncate() {
+        jdbcTemplate.update("truncate table weather", emptyMap<String, Any>())
+    }
 }

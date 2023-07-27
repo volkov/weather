@@ -54,7 +54,7 @@ class WeatherApplication(
 
     private fun getFromOrDefault(from: ZonedDateTime?) = from ?: ZonedDateTime.now().minus(defaultDuration)
 
-    @PutMapping("api/")
+    @PutMapping("api")
     fun putWeather(@RequestBody weather: Weather, @RequestHeader("secret") secret: String) {
         if (secret != this.secret) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN, "Security...")

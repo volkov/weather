@@ -94,7 +94,7 @@ class WeatherService(
     }
 
     fun save(weather: Weather) {
-        kafkaTemplate.send("topic", weather.toString())
+        kafkaTemplate.send(TOPIC, weather.toString())
         weatherRepository.save(weather)
     }
 

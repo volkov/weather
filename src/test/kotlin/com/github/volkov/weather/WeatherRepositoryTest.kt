@@ -1,6 +1,8 @@
 package com.github.volkov.weather
 
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.annotation.Transactional
@@ -12,8 +14,12 @@ import java.time.ZonedDateTime
  * Date: 6/12/20
  * Time: 2:13 AM
  */
-@Transactional
 class WeatherRepositoryTest(@Autowired val weatherRepository: WeatherRepository) : WeatherApplicationBaseTest() {
+
+    @BeforeEach
+    fun clean() {
+        weatherRepository.truncate()
+    }
 
     @Test
     fun insert() {
@@ -63,4 +69,5 @@ class WeatherRepositoryTest(@Autowired val weatherRepository: WeatherRepository)
             ),
         )
     }
+
 }
