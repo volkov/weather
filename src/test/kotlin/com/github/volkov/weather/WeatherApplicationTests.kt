@@ -1,10 +1,8 @@
 package com.github.volkov.weather
 
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
 
-@SpringBootTest
-class WeatherApplicationTests {
+class WeatherApplicationTests : WeatherApplicationBaseTest() {
 
     @Test
     fun contextLoads() {
