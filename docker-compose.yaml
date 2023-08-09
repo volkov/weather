@@ -57,5 +57,17 @@ services:
       CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
       CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
       CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+
+  clickhouse:
+    image: yandex/clickhouse-server
+    ports:
+      - "8123:8123" # HTTP port
+      - "9000:9000" # Native port
+      - "9009:9009" # Replication port
+    volumes:
+      - ./clickhouse/config.xml:/etc/clickhouse-server/config.xml
+      - ./clickhouse/metadata:/var/lib/clickhouse/metadata
+    environment:
+      - CLICKHOUSE_CONFIG=/etc/clickhouse-server/config.xml
 volumes:
   weather_pgdata:
